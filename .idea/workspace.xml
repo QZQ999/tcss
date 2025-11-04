@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="cb41c8b3-f05a-415f-8b78-91082f1421aa" name="默认更改列表" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeStyleSettingsInfer">
+    <option name="done" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="localRepository" value="E:\java\repository" />
+        <option name="mavenHome" value="E:/java/apache-maven-3.6.3" />
+        <option name="userSettingsFile" value="E:\java\apache-maven-3.6.3\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="1" />
+  </component>
+  <component name="ProjectId" id="2HZ0xCX9VN3t9fRem6m2ZJlEbhA" />
+  <component name="ProjectViewState">
+    <option name="flattenPackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+    <option name="showVisibilityIcons" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="extract.method.default.visibility" value="private" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.15136719" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+  </component>
+  <component name="RecentsManager">
+    <key name="ExtractSuperBase.RECENT_KEYS">
+      <recent name="HGTM" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\code\java\InteractionTaskMigration\src\main\java\MPFTM" />
+      <recent name="E:\code\java\cascadingFailuresTaskMigration" />
+      <recent name="E:\code\java\cascadingFailuresTaskMigration\src\main\java\GreedyPath" />
+      <recent name="E:\code\java\cascadingFailuresTaskMigration\src\main\java" />
+      <recent name="E:\code\java\cascadingFailuresTaskMigration\src\main\java\greedy" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="main" />
+      <recent name="tmpf" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\code\java\cascadingFailuresTaskMigration" />
+      <recent name="E:\code\java\cascadingFailuresTaskMigration\src" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" singleton="false" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="main.Main" />
+      <module name="InteractionTaskMigration" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="main.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cb41c8b3-f05a-415f-8b78-91082f1421aa" name="默认更改列表" comment="" />
+      <created>1668477542940</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1668477542940</updated>
+      <workItem from="1668477547891" duration="1873000" />
+      <workItem from="1668737653863" duration="8993000" />
+      <workItem from="1668995961844" duration="9511000" />
+      <workItem from="1669078949323" duration="17008000" />
+      <workItem from="1669165552437" duration="13783000" />
+      <workItem from="1669251678362" duration="20996000" />
+      <workItem from="1669340800003" duration="14847000" />
+      <workItem from="1669434310684" duration="17443000" />
+      <workItem from="1669597036568" duration="19548000" />
+      <workItem from="1669689914087" duration="10362000" />
+      <workItem from="1669773627608" duration="415000" />
+      <workItem from="1669795190724" duration="11072000" />
+      <workItem from="1669859359632" duration="9122000" />
+      <workItem from="1669898387526" duration="4955000" />
+      <workItem from="1669903399873" duration="1501000" />
+      <workItem from="1669946898217" duration="4596000" />
+      <workItem from="1669951635832" duration="1395000" />
+      <workItem from="1670818534910" duration="24000" />
+      <workItem from="1680705196857" duration="15000" />
+      <workItem from="1680705293532" duration="94000" />
+      <workItem from="1680833953757" duration="13988000" />
+      <workItem from="1680918964378" duration="6995000" />
+      <workItem from="1681025520102" duration="9167000" />
+      <workItem from="1681089362253" duration="13733000" />
+      <workItem from="1684836443491" duration="868000" />
+      <workItem from="1684850858437" duration="2195000" />
+      <workItem from="1684891440739" duration="1153000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="733" y="189" width="608" height="734" key="#Main" timestamp="1681094235673">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state x="733" y="189" width="608" height="734" key="#Main/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1681094235673" />
+    <state x="830" y="273" key="#com.intellij.ide.util.MemberChooser" timestamp="1681028337130">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state x="830" y="273" key="#com.intellij.ide.util.MemberChooser/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1681028337130" />
+    <state x="854" y="397" width="339" height="319" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1680964979927">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state x="854" y="397" width="339" height="319" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1680964979927" />
+    <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1681046928425">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1681046928425" />
+    <state x="804" y="312" key="FileChooserDialogImpl" timestamp="1681094145064">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state x="804" y="312" key="FileChooserDialogImpl/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1681094145064" />
+    <state width="2005" height="149" key="GridCell.Tab.0.bottom" timestamp="1684853070232">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state width="2005" height="149" key="GridCell.Tab.0.bottom/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1684853070232" />
+    <state width="2005" height="149" key="GridCell.Tab.0.center" timestamp="1684853070232">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state width="2005" height="149" key="GridCell.Tab.0.center/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1684853070232" />
+    <state width="2005" height="149" key="GridCell.Tab.0.left" timestamp="1684853070232">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state width="2005" height="149" key="GridCell.Tab.0.left/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1684853070232" />
+    <state width="2005" height="149" key="GridCell.Tab.0.right" timestamp="1684853070232">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state width="2005" height="149" key="GridCell.Tab.0.right/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1684853070232" />
+    <state width="2005" height="189" key="GridCell.Tab.1.bottom" timestamp="1681127857282">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state width="2005" height="189" key="GridCell.Tab.1.bottom/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1681127857282" />
+    <state width="2005" height="189" key="GridCell.Tab.1.center" timestamp="1681127857282">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state width="2005" height="189" key="GridCell.Tab.1.center/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1681127857282" />
+    <state width="2005" height="189" key="GridCell.Tab.1.left" timestamp="1681127857282">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state width="2005" height="189" key="GridCell.Tab.1.left/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1681127857282" />
+    <state width="2005" height="189" key="GridCell.Tab.1.right" timestamp="1681127857282">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state width="2005" height="189" key="GridCell.Tab.1.right/2560.155.1920.1030/0.0.2048.1112@0.0.2048.1112" timestamp="1681127857282" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/MPFTM/TaskMigrationBasedPon.java</url>
+          <line>110</line>
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/cascadingFailuresTaskMigration$Main.ic" NAME="Main Coverage Results" MODIFIED="1669452368228" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>main.*</FILTER>
+    </SUITE>
+  </component>
+</project>
