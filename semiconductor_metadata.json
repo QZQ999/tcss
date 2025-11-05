@@ -1,0 +1,27 @@
+{
+  "description": "Semiconductor supply chain network experiment",
+  "data_source": "CSET Semiconductor Supply Chain Dataset",
+  "network": {
+    "num_nodes": 393,
+    "num_edges": 4250,
+    "is_connected": true,
+    "avg_degree": 21.62849872773537
+  },
+  "providers": {
+    "total": 397,
+    "countries": 22,
+    "types": {
+      "organization": 374,
+      "country": 23
+    }
+  },
+  "inputs": {
+    "total": 126,
+    "stages": {
+      "Fabrication": 7,
+      "Design": 2,
+      "Assembly, testing, and packaging (ATP)": 2
+    }
+  },
+  "provision_relationships": 1305
+}
