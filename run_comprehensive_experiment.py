@@ -28,6 +28,7 @@ sys.path.append('python_src')
 from semiconductor_network_builder import SemiconductorNetworkBuilder
 from supply_chain_analysis import SupplyChainAnalyzer
 from baseline_algorithms import get_all_baseline_algorithms
+from additional_algorithms import get_additional_algorithms
 from input.reader import Reader
 from hgtm.hgtm import Hgtm
 from evaluation.evaluation_extra_target import EvaluationExtraTarget
@@ -123,6 +124,9 @@ class ComprehensiveSupplyChainExperiment:
         # Test algorithms
         algorithms_to_test = [
             ('HGTM', 'hgtm'),
+            ('MPFTM', 'mpftm'),
+            ('GBMA', 'gbma'),
+            ('MMLMA', 'mmlma'),
             ('Random', 'random'),
             ('Greedy', 'greedy'),
             ('LoadBalance', 'load_balance'),
@@ -145,6 +149,21 @@ class ComprehensiveSupplyChainExperiment:
                         # Run HGTM
                         hgtm = Hgtm(tasks, arc_graph, robots, a, b)
                         experiment_result = hgtm.hgtm_run()
+
+                        mean_execute_cost = experiment_result.get_mean_execute_cost()
+                        mean_migration_cost = experiment_result.get_mean_migration_cost()
+                        mean_survival_rate = experiment_result.get_mean_survival_rate()
+
+                    elif algo_type in ['mpftm', 'gbma', 'mmlma']:
+                        # Run additional algorithms (MPFTM, GBMA, MMLMA)
+                        additional_algos = get_additional_algorithms(tasks, arc_graph, robots, a, b)
+                        algo_map = {
+                            'gbma': 0,
+                            'mmlma': 1,
+                            'mpftm': 2
+                        }
+                        selected_algo = additional_algos[algo_map[algo_type]]
+                        experiment_result = selected_algo.run()
 
                         mean_execute_cost = experiment_result.get_mean_execute_cost()
                         mean_migration_cost = experiment_result.get_mean_migration_cost()
