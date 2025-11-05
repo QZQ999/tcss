@@ -208,7 +208,7 @@ class SemiconductorNetworkBuilder:
 
         Each agent represents a provider's capacity to handle semiconductor tasks.
         Agent properties:
-        - robot_id: unique identifier (maps to provider_id)
+        - robot_id: unique identifier (integer, mapped from provider_id)
         - capacity: based on provider type and market presence
         - group_id: assigned based on geographic/organizational clustering
 
@@ -232,27 +232,36 @@ class SemiconductorNetworkBuilder:
             self.providers_df['provider_id'].isin(network_provider_ids)
         ]
 
+        # Create ID mapping from string to integer
+        provider_id_map = {}
+        for idx, provider_id in enumerate(sorted(network_provider_ids)):
+            provider_id_map[provider_id] = idx
+
+        # Build relabeled network for community detection
+        relabeled_network = nx.relabel_nodes(self.network, provider_id_map)
+
         # Assign groups based on clustering (could use geographic or type-based)
         # For simplicity, use community detection on the network
-        if len(self.network.nodes()) > 0:
+        if len(relabeled_network.nodes()) > 0:
             try:
                 # Use community detection for group assignment
-                communities = nx.community.greedy_modularity_communities(self.network)
+                communities = nx.community.greedy_modularity_communities(relabeled_network)
                 provider_to_group = {}
                 for group_id, community in enumerate(communities[:num_groups]):
-                    for provider_id in community:
-                        provider_to_group[provider_id] = group_id
+                    for numeric_id in community:
+                        provider_to_group[numeric_id] = group_id
             except:
                 # Fallback: assign groups randomly
-                provider_ids = list(network_provider_ids)
                 provider_to_group = {
-                    pid: i % num_groups for i, pid in enumerate(provider_ids)
+                    numeric_id: numeric_id % num_groups
+                    for numeric_id in relabeled_network.nodes()
                 }
         else:
             provider_to_group = {}
 
         for _, provider in providers_in_network.iterrows():
-            provider_id = provider['provider_id']
+            original_id = provider['provider_id']
+            numeric_id = provider_id_map[original_id]
 
             # Capacity based on provider type
             if provider['provider_type'] == 'Country':
@@ -265,15 +274,19 @@ class SemiconductorNetworkBuilder:
             capacity = round(capacity, 2)
 
             # Assign group
-            group_id = provider_to_group.get(provider_id, 0)
+            group_id = provider_to_group.get(numeric_id, 0)
 
             agents.append({
-                'robot_id': provider_id,
+                'robot_id': numeric_id,
+                'original_id': original_id,
                 'capacity': capacity,
                 'group_id': group_id,
                 'provider_name': provider['provider_name'],
                 'country': provider['country']
             })
+
+        # Sort by robot_id for consistency
+        agents.sort(key=lambda x: x['robot_id'])
 
         # Write agents to file in required format: robot_id capacity group_id
         output_path = Path(output_file)
@@ -285,6 +298,9 @@ class SemiconductorNetworkBuilder:
         print(f"  - Organized into {num_groups} groups")
         print(f"  - Agents written to {output_file}")
 
+        # Store ID mapping for graph generation
+        self.provider_id_map = provider_id_map
+
         return agents
 
     def generate_graph(self, output_file: str = "Graph_semiconductor.txt"):
@@ -292,6 +308,7 @@ class SemiconductorNetworkBuilder:
         Generate graph topology file from network.
 
         Graph format: node1 node2 weight (one edge per line)
+        Uses integer node IDs matching the agent IDs.
 
         Args:
             output_file: Output file path for graph
@@ -301,14 +318,20 @@ class SemiconductorNetworkBuilder:
         if self.network is None:
             raise ValueError("Network must be built before generating graph")
 
+        if not hasattr(self, 'provider_id_map'):
+            raise ValueError("Agents must be generated before graph (to create ID mapping)")
+
+        # Relabel network with integer IDs
+        relabeled_network = nx.relabel_nodes(self.network, self.provider_id_map)
+
         output_path = Path(output_file)
         with open(output_path, 'w') as f:
-            for u, v, data in self.network.edges(data=True):
+            for u, v, data in relabeled_network.edges(data=True):
                 weight = data.get('weight', 1.0)
                 f.write(f"{u} {v} {weight}\n")
 
         print(f"  - Graph written to {output_file}")
-        print(f"  - {self.network.number_of_edges()} edges exported")
+        print(f"  - {relabeled_network.number_of_edges()} edges exported")
 
     def generate_metadata(self, output_file: str = "semiconductor_metadata.json"):
         """

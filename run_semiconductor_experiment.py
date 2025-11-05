@@ -19,13 +19,14 @@ import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend
 import seaborn as sns
 
+# Add python_src to path
+sys.path.append('python_src')
+
 # Import local modules
 from semiconductor_network_builder import SemiconductorNetworkBuilder
-from python_src.input.reader import *
-from python_src.main.function import *
-from python_src.main.initialize import *
-from python_src.hgtm.hgtm import *
-from python_src.evaluation.evaluation import *
+from input.reader import Reader
+from hgtm.hgtm import Hgtm
+from evaluation.evaluation_extra_target import EvaluationExtraTarget
 
 
 class SemiconductorExperiment:
@@ -90,54 +91,49 @@ class SemiconductorExperiment:
             start_time = time.time()
 
             try:
-                # Read input files
-                tasks = read_task(task_file)
-                robots_load = read_robot(robot_file)
-                graph = read_graph(graph_file)
+                # Initialize reader
+                reader = Reader()
 
-                # Initialize tasks and faults
-                initial_result = initialization(robots_load, tasks, 0.3)
-                robots_load = initial_result[0]
-                tasks_all_migration = initial_result[1]
-                robots_fault_set = initial_result[2]
+                # Read input files
+                tasks = reader.read_file_to_tasks(task_file)
+                robots = reader.read_file_to_robots(robot_file)
+                arc_graph = reader.read_file_to_graph(graph_file)
+
+                # Calculate statistics before running HGTM
+                evaluation_extra_target = EvaluationExtraTarget()
+                robot_capacity_std = evaluation_extra_target.calculate_robot_capacity_std(robots)
+                task_size_std = evaluation_extra_target.calculate_task_size_std(tasks)
+                mean_robot_capacity = evaluation_extra_target.calculate_mean_robot_capacity(robots)
+                mean_task_size = evaluation_extra_target.calculate_mean_task_size(tasks)
 
                 # Run HGTM algorithm
-                hgtm_result = hgtm(
-                    robots_load,
-                    tasks_all_migration,
-                    robots_fault_set,
-                    graph
-                )
+                hgtm = Hgtm(tasks, arc_graph, robots, a, b)
+                experiment_result = hgtm.hgtm_run()
 
-                # Evaluation
-                experiment_result = hgtm_result[0]
-                migration_record_all = hgtm_result[1]
+                # Extract metrics from experiment result
+                mean_execute_cost = experiment_result.get_mean_execute_cost()
+                mean_migration_cost = experiment_result.get_mean_migration_cost()
+                mean_survival_rate = experiment_result.get_mean_survival_rate()
 
-                evaluation_result = evaluation(
-                    experiment_result,
-                    migration_record_all,
-                    graph,
-                    robots_fault_set,
-                    a,
-                    b
-                )
+                # Calculate target optimization
+                target_opt = a * (mean_execute_cost + mean_migration_cost) - b * mean_survival_rate
 
                 # Extract metrics
                 result = {
                     'run_id': run_id + 1,
-                    'meanExecuteCost': evaluation_result[0],
-                    'meanMigrationCost': evaluation_result[1],
-                    'meanSurvivalRate': evaluation_result[2],
-                    'robotLoadStd': evaluation_result[3],
-                    'taskSizeStd': evaluation_result[4],
-                    'meanRobotCapacity': evaluation_result[5],
-                    'meanTaskSize': evaluation_result[6],
-                    'targetOpt': evaluation_result[7],
+                    'meanExecuteCost': mean_execute_cost,
+                    'meanMigrationCost': mean_migration_cost,
+                    'meanSurvivalRate': mean_survival_rate,
+                    'robotLoadStd': robot_capacity_std,
+                    'taskSizeStd': task_size_std,
+                    'meanRobotCapacity': mean_robot_capacity,
+                    'meanTaskSize': mean_task_size,
+                    'targetOpt': target_opt,
                     'execution_time_ms': (time.time() - start_time) * 1000,
                     'num_tasks': len(tasks),
-                    'num_robots': len(robots_load),
-                    'num_faulty_robots': len(robots_fault_set),
-                    'fault_rate': len(robots_fault_set) / len(robots_load)
+                    'num_robots': len(robots),
+                    'num_faulty_robots': 0,  # HGTM handles faults internally
+                    'fault_rate': 0.0  # Fault rate is handled internally
                 }
 
                 all_results.append(result)

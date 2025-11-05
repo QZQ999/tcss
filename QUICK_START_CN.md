@@ -109,7 +109,7 @@ results = self.run_hgtm_experiment(
 ## ❓ 常见问题
 
 **Q: 实验运行需要多长时间？**
-A: 10次运行约1-3分钟
+A: 取决于网络规模。半导体数据集规模较大（393节点，4250边），每次运行约2-5分钟，10次运行可能需要20-50分钟
 
 **Q: 如何修改故障率？**
 A: 修改 `python_src/main/initialize.py` 中 `initialization()` 的第三个参数（默认0.3）
