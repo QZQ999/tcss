@@ -178,7 +178,7 @@ class TaskMigrationBasedPon:
 
     def find_migrated_robot(self, f_robot):
         """Find migration target robot"""
-        from input.agent import Agent
+        from python_src.input.agent import Agent
         migrated_robot = Agent()
 
         edges = self.arc_graph.edges(f_robot.get_robot_id())
