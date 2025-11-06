@@ -21,9 +21,12 @@ class Initialize:
             fault_size += 1
         step = size // fault_size
 
+        # Get list of robot IDs (not assume sequential 0,1,2...)
+        robot_ids = list(id_to_robots.keys())
+
         # fault_p represents the proportion of nodes with functional faults
-        for i in range(size):
-            robot = id_to_robots[i]
+        for i, robot_id in enumerate(robot_ids):
+            robot = id_to_robots[robot_id]
             if i % step == 1:
                 # Faults occur regionally
                 robot.set_fault_a(1)
@@ -32,7 +35,7 @@ class Initialize:
                 group.set_group_capacity(group.get_group_capacity() - robot.get_capacity())
 
             function = Function(id_to_robots, id_to_groups)
-            fault_o = 1 - function.calculate_over_load_is(id_to_robots[i])
+            fault_o = 1 - function.calculate_over_load_is(robot)
             robot.set_fault_o(fault_o)
             # Set component overload fault probability
 
@@ -65,7 +68,7 @@ class Initialize:
             group_id = robot.get_group_id()
             group = id_to_groups.get(group_id)
             if group is None:
-                from input.group import Group
+                from python_src.input.group import Group
                 group = Group()
                 group.set_group_id(group_id)
 
