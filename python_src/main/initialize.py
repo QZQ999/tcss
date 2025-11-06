@@ -21,9 +21,12 @@ class Initialize:
             fault_size += 1
         step = size // fault_size
 
+        # Get list of robot IDs (not assume sequential 0,1,2...)
+        robot_ids = list(id_to_robots.keys())
+
         # fault_p represents the proportion of nodes with functional faults
-        for i in range(size):
-            robot = id_to_robots[i]
+        for i, robot_id in enumerate(robot_ids):
+            robot = id_to_robots[robot_id]
             if i % step == 1:
                 # Faults occur regionally
                 robot.set_fault_a(1)
@@ -32,7 +35,7 @@ class Initialize:
                 group.set_group_capacity(group.get_group_capacity() - robot.get_capacity())
 
             function = Function(id_to_robots, id_to_groups)
-            fault_o = 1 - function.calculate_over_load_is(id_to_robots[i])
+            fault_o = 1 - function.calculate_over_load_is(robot)
             robot.set_fault_o(fault_o)
             # Set component overload fault probability
 
@@ -65,7 +68,7 @@ class Initialize:
             group_id = robot.get_group_id()
             group = id_to_groups.get(group_id)
             if group is None:
-                from input.group import Group
+                from python_src.input.group import Group
                 group = Group()
                 group.set_group_id(group_id)
 
@@ -119,3 +122,52 @@ class Initialize:
 
         tasks_pre.pop(0)
         robot.set_tasks_list(robot_tasks_list)
+
+
+# Convenience function for simplified initialization
+def initialization(robots, tasks, fault_rate=0.3):
+    """
+    Simplified initialization function
+
+    Args:
+        robots: List of robot/agent objects
+        tasks: List of task objects
+        fault_rate: Proportion of robots that should fail (default: 0.3)
+
+    Returns:
+        Tuple of (robots, tasks_all_migration, robots_fault_set)
+    """
+    from ..input.group import Group
+
+    # Create ID mappings
+    id_to_groups = {}
+    id_to_robots = {}
+
+    for robot in robots:
+        rid = robot.get_robot_id()
+        gid = robot.get_group_id()
+        id_to_robots[rid] = robot
+
+        if gid not in id_to_groups:
+            group = Group()
+            group.set_group_id(gid)
+            group.set_robot_id_in_group(set())
+            group.set_group_capacity(0.0)
+            group.set_group_load(0.0)
+            id_to_groups[gid] = group
+
+    # Run initialization
+    initializer = Initialize()
+    initializer.fault_p = fault_rate
+    initializer.run(tasks, robots, id_to_groups, id_to_robots)
+
+    # Collect faulty robots
+    robots_fault_set = []
+    for robot in robots:
+        if robot.get_fault_a() == 1:
+            robots_fault_set.append(robot)
+
+    # All tasks are migration tasks (simplified)
+    tasks_all_migration = tasks.copy()
+
+    return (robots, tasks_all_migration, robots_fault_set)

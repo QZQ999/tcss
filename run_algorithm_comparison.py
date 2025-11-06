@@ -22,11 +22,11 @@ import seaborn as sns
 # Import local modules
 from python_src.input.reader import read_task, read_robot, read_graph
 from python_src.main.initialize import initialization
-from python_src.hgtm.hgtm import hgtm
+from python_src.hgtm.hgtm import Hgtm
 from python_src.gbma.gbma import GBMA
 from python_src.mmlma.mmlma import MMLMA
 from python_src.mpftm.mpftm import MPFTM
-from python_src.evaluation.evaluation import evaluation
+from python_src.evaluation.evaluation import Evaluation
 
 
 class AlgorithmComparison:
@@ -66,9 +66,9 @@ class AlgorithmComparison:
         try:
             if algorithm_name == "HGTM":
                 # Run HGTM
-                hgtm_result = hgtm(robots_load, tasks, [], graph)
-                experiment_result = hgtm_result[0]
-                migration_records = hgtm_result[1]
+                hgtm_algo = Hgtm(tasks, graph, robots_load, a, b)
+                experiment_result = hgtm_algo.hgtm_run()
+                migration_records = []  # HGTM returns migration records internally
 
             elif algorithm_name == "GBMA":
                 # Run GBMA
@@ -169,27 +169,51 @@ class AlgorithmComparison:
                         print(f"  ✗ {alg_name} failed")
                         continue
 
-                    # Evaluation
-                    evaluation_result = evaluation(
-                        experiment_result,
-                        migration_records if migration_records else [],
-                        graph_copy,
-                        robots_fault_set,
-                        a, b
-                    )
+                    # Evaluation - calculate metrics manually
+                    # Build id_to_robots and id_to_groups mappings
+                    id_to_robots = {}
+                    id_to_groups = {}
+                    for robot in robots_copy:
+                        id_to_robots[robot.get_robot_id()] = robot
+                        gid = robot.get_group_id()
+                        if gid not in id_to_groups:
+                            from python_src.input.group import Group
+                            group = Group()
+                            group.set_group_id(gid)
+                            id_to_groups[gid] = group
+
+                    evaluator = Evaluation(id_to_robots, id_to_groups)
+
+                    # Calculate metrics
+                    mean_execute_cost = evaluator.calculate_execute_tasks_cost(robots_copy)
+                    mean_migration_cost = evaluator.calculate_migration_cost(graph_copy, migration_records)
+                    mean_survival_rate = evaluator.calculate_mean_survival_rate(robots_copy)
+
+                    # Calculate additional statistics
+                    robot_loads = [r.get_load() for r in robots_copy]
+                    robot_capacities = [r.get_capacity() for r in robots_copy]
+                    task_sizes = [t.get_size() for t in tasks_copy]
+
+                    robot_load_std = np.std(robot_loads) if robot_loads else 0.0
+                    task_size_std = np.std(task_sizes) if task_sizes else 0.0
+                    mean_robot_capacity = np.mean(robot_capacities) if robot_capacities else 0.0
+                    mean_task_size = np.mean(task_sizes) if task_sizes else 0.0
+
+                    # Calculate target optimization score (lower is better)
+                    target_opt = a * mean_execute_cost + (1 - a) * mean_migration_cost - b * mean_survival_rate
 
                     # Extract metrics
                     result = {
                         'run_id': run_id + 1,
                         'algorithm': alg_name,
-                        'meanExecuteCost': evaluation_result[0],
-                        'meanMigrationCost': evaluation_result[1],
-                        'meanSurvivalRate': evaluation_result[2],
-                        'robotLoadStd': evaluation_result[3],
-                        'taskSizeStd': evaluation_result[4],
-                        'meanRobotCapacity': evaluation_result[5],
-                        'meanTaskSize': evaluation_result[6],
-                        'targetOpt': evaluation_result[7],
+                        'meanExecuteCost': mean_execute_cost,
+                        'meanMigrationCost': mean_migration_cost,
+                        'meanSurvivalRate': mean_survival_rate,
+                        'robotLoadStd': robot_load_std,
+                        'taskSizeStd': task_size_std,
+                        'meanRobotCapacity': mean_robot_capacity,
+                        'meanTaskSize': mean_task_size,
+                        'targetOpt': target_opt,
                         'execution_time_ms': exec_time,
                         'num_tasks': len(tasks_copy),
                         'num_robots': len(robots_copy),

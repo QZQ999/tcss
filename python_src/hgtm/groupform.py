@@ -1,7 +1,7 @@
 """Groupform class for grouping agents into bags"""
 import sys
 sys.path.append('..')
-from main.function import Function
+from python_src.main.function import Function
 
 
 class Groupform:
@@ -49,13 +49,15 @@ class Groupform:
 
         while pq:
             _, _, bag_m = heapq.heappop(pq)
-            flag = 0
-            pq_temp = list(pq)
-            size = len(pq_temp)
+            merged = False
 
-            while pq_temp:
-                _, _, bag_n = heapq.heappop(pq_temp)
+            # Extract all remaining bags from pq
+            remaining_bags = []
+            while pq:
+                remaining_bags.append(heapq.heappop(pq))
 
+            # Try to merge bag_m with each remaining bag
+            for i, (priority, bag_id, bag_n) in enumerate(remaining_bags):
                 if bag_n is None:
                     continue
 
@@ -66,19 +68,32 @@ class Groupform:
                 ben_m = self.ben_intra(bag_m)
 
                 if ben_temp > (ben_n + ben_m):
-                    heapq.heappush(pq, (self.compare_bag(bag_temp), id(bag_temp), bag_temp))
-
+                    # Merge is beneficial
+                    # Remove old entries from bags_to_agent
                     bag_m_tuple = tuple(bag_m)
                     bag_n_tuple = tuple(bag_n)
                     if bag_m_tuple in self.bags_to_agent:
                         del self.bags_to_agent[bag_m_tuple]
                     if bag_n_tuple in self.bags_to_agent:
                         del self.bags_to_agent[bag_n_tuple]
-                else:
-                    flag += 1
 
-            if flag == size:
+                    # Put merged bag back in pq
+                    heapq.heappush(pq, (self.compare_bag(bag_temp), id(bag_temp), bag_temp))
+
+                    # Put back all other bags except bag_n (which was merged)
+                    for j, bag_item in enumerate(remaining_bags):
+                        if j != i:
+                            heapq.heappush(pq, bag_item)
+
+                    merged = True
+                    break
+
+            if not merged:
+                # No beneficial merge found, bag_m is final
                 temp.append(bag_m)
+                # Put back all remaining bags
+                for bag_item in remaining_bags:
+                    heapq.heappush(pq, bag_item)
 
         self.bags = temp
 

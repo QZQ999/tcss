@@ -1,8 +1,8 @@
 """CalculatePonField class for calculating potential fields"""
 import sys
 sys.path.append('..')
-from input.potential_field import PotentialField
-from main.function import Function
+from python_src.input.potential_field import PotentialField
+from python_src.main.function import Function
 
 
 class CalculatePonField:

@@ -1,10 +1,9 @@
 """MPFTM (Multi-layer Potential Field Task Migration) Algorithm"""
 import sys
-import networkx as nx
 sys.path.append('..')
-from input.experiment_result import ExperimentResult
-from main.initialize import Initialize
-from evaluation.evaluation import Evaluation
+from python_src.input.experiment_result import ExperimentResult
+from python_src.main.initialize import Initialize
+from python_src.evaluation.evaluation import Evaluation
 from .finder_leader import FinderLeader
 from .finder_ad_leaders import FinderAdLeaders
 from .ad_leaders_replace import AdLeadersReplace
