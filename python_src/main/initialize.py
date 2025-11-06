@@ -139,6 +139,11 @@ def initialization(robots, tasks, fault_rate=0.3):
     """
     from ..input.group import Group
 
+    # IMPORTANT: Set all tasks' arrive_time to -1 for initial assignment
+    # The ini_task method only processes tasks with arrive_time == -1
+    for task in tasks:
+        task.set_arrive_time(-1)
+
     # Create ID mappings
     id_to_groups = {}
     id_to_robots = {}

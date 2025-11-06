@@ -36,19 +36,34 @@ class Hgtm:
         """Run HGTM algorithm"""
         print("hgtmRun")
 
-        ini = MainInitialize()
         experiment_result = ExperimentResult()
 
+        # Build robot and group ID mappings from already-initialized robots
         for robot in self.agents:
-            self.id_to_agents[robot.get_robot_id()] = robot
+            rid = robot.get_robot_id()
+            gid = robot.get_group_id()
+            self.id_to_agents[rid] = robot
 
-        ini.run(self.tasks, self.agents, self.id_to_groups, self.id_to_agents)
+            if gid not in self.id_to_groups:
+                from python_src.input.group import Group
+                group = Group()
+                group.set_group_id(gid)
+                group.set_robot_id_in_group(set())
+                group.set_group_capacity(0.0)
+                group.set_group_load(0.0)
+                self.id_to_groups[gid] = group
 
+            # Add robot to group
+            self.id_to_groups[gid].get_robot_id_in_group().add(rid)
+            self.id_to_groups[gid].set_group_capacity(
+                self.id_to_groups[gid].get_group_capacity() + robot.get_capacity()
+            )
+            self.id_to_groups[gid].set_group_load(
+                self.id_to_groups[gid].get_group_load() + robot.get_load()
+            )
+
+        # Create evaluation with proper mappings
         evaluation = Evaluation(self.id_to_agents, self.id_to_groups)
-
-        sum_migration_cost = 0.0
-        sum_execute_cost = -5.0
-        survival_rate = 0.06
 
         # Leader selection
         self.leader_selection(self.id_to_groups, self.id_to_agents, self.arc_graph)
@@ -83,10 +98,11 @@ class Hgtm:
             self.a, self.b, self.id_to_i
         ).run(bags_to_agent)
 
-        sum_migration_cost += evaluation.calculate_migration_cost(
-            self.arc_graph, migration_records) * 0.65
-        sum_execute_cost += evaluation.calculate_execute_tasks_cost(self.agents) * 0.70
-        survival_rate += evaluation.calculate_mean_survival_rate(self.agents)
+        # Calculate performance metrics
+        sum_migration_cost = evaluation.calculate_migration_cost(
+            self.arc_graph, migration_records)
+        sum_execute_cost = evaluation.calculate_execute_tasks_cost(self.agents)
+        survival_rate = evaluation.calculate_mean_survival_rate(self.agents)
 
         experiment_result.set_mean_migration_cost(sum_migration_cost)
         experiment_result.set_mean_execute_cost(sum_execute_cost)
