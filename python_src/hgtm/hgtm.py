@@ -9,10 +9,10 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 import networkx as nx
-from input.experiment_result import ExperimentResult
-from main.initialize import Initialize as MainInitialize
-from evaluation.evaluation import Evaluation
-from mpftm.ini_context_load_i import IniContextLoadI
+from python_src.input.experiment_result import ExperimentResult
+from python_src.main.initialize import Initialize as MainInitialize
+from python_src.evaluation.evaluation import Evaluation
+from python_src.mpftm.ini_context_load_i import IniContextLoadI
 from mpftm.calculate_pon_field import CalculatePonField
 from hgtm.finder_leader import FinderLeader
 from hgtm.finder_ad_leaders import FinderAdLeaders

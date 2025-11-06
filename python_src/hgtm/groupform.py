@@ -1,7 +1,7 @@
 """Groupform class for grouping agents into bags"""
 import sys
 sys.path.append('..')
-from main.function import Function
+from python_src.main.function import Function
 
 
 class Groupform:

@@ -1,7 +1,7 @@
 """IniContextLoadI class for initializing contextual load"""
 import sys
 sys.path.append('..')
-from main.function import Function
+from python_src.main.function import Function
 
 
 class IniContextLoadI:

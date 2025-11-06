@@ -2,7 +2,7 @@
 import networkx as nx
 import sys
 sys.path.append('..')
-from main.function import Function
+from python_src.main.function import Function
 
 
 class FinderLeader:

@@ -1,7 +1,7 @@
 """TaskMigrationBasedPon class for task migration based on potential fields"""
 import sys
 sys.path.append('..')
-from input.migration_record import MigrationRecord
+from python_src.input.migration_record import MigrationRecord
 from .ini_context_load_i import IniContextLoadI
 from .calculate_pon_field import CalculatePonField
 
