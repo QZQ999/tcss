@@ -401,7 +401,7 @@ class ComprehensiveSupplyChainAnalysis:
                         alg_results.append({
                             'fault_rate': fault_rate,
                             'remaining_capacity_ratio': remaining_capacity / total_capacity if total_capacity > 0 else 0,
-                            'survival_rate': result['survival_rate'],
+                            'survival_rate': result['survivalRate'],  # Use camelCase
                             'target_opt': result['target_opt'],
                             'network_connected': nx.is_connected(G_test) if len(G_test.nodes()) > 0 else False,
                             'num_components': nx.number_connected_components(G_test),
