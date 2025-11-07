@@ -224,7 +224,7 @@ class ComprehensiveSupplyChainAnalysis:
             return {
                 'executeCost': exec_cost,
                 'migrationCost': mig_cost,
-                'survival_rate': survival_rate,
+                'survivalRate': survival_rate,  # Use camelCase to match _evaluate_result
                 'target_opt': target_opt,
                 'loadBalance': 0.0  # Placeholder
             }
@@ -774,18 +774,23 @@ class ComprehensiveSupplyChainAnalysis:
             # 5. Resilience Analysis
             f.write("## 5. Supply Chain Resilience Assessment\n\n")
 
-            if self.resilience_results:
-                f.write("### 5.1 Fault Tolerance\n\n")
-                f.write("| Fault Rate | Remaining Capacity | Network Connected | # Components |\n")
-                f.write("|------------|-------------------|------------------|-------------|\n")
+            if hasattr(self, 'resilience_by_algorithm') and self.resilience_by_algorithm:
+                f.write("### 5.1 Algorithm Comparison under Fault Scenarios\n\n")
 
-                for r in self.resilience_results:
-                    f.write(f"| {r['fault_rate']:.0%} | {r['remaining_capacity_ratio']:.2%} | "
-                           f"{'Yes' if r['network_connected'] else 'No'} | {r['num_components']} |\n")
+                for alg_name, results in self.resilience_by_algorithm.items():
+                    if results:
+                        f.write(f"**{alg_name}:**\n\n")
+                        f.write("| Fault Rate | Survival Rate | Target Opt | Network Connected |\n")
+                        f.write("|------------|---------------|------------|------------------|\n")
 
-                f.write("\n**Business Implication:** Shows how supply chain capacity and connectivity ")
-                f.write("degrade under increasing levels of disruption. Helps assess risk tolerance ")
-                f.write("and need for redundancy investments.\n\n")
+                        for r in results:
+                            f.write(f"| {r['fault_rate']:.0%} | {r['survival_rate']:.2%} | "
+                                   f"{r['target_opt']:.2f} | {'Yes' if r['network_connected'] else 'No'} |\n")
+                        f.write("\n")
+
+                f.write("\n**Business Implication:** Comparison shows which algorithm maintains better performance ")
+                f.write("under increasing disruption levels. This helps select the most resilient algorithm ")
+                f.write("for supply chain management in uncertain environments.\n\n")
 
             # 6. Recommendations
             f.write("## 6. Strategic Recommendations\n\n")
@@ -830,9 +835,13 @@ class ComprehensiveSupplyChainAnalysis:
             # Network metrics
             pd.DataFrame([self.network_metrics]).to_excel(writer, sheet_name='Network Metrics', index=False)
 
-            # Resilience results
-            if self.resilience_results:
-                pd.DataFrame(self.resilience_results).to_excel(writer, sheet_name='Resilience', index=False)
+            # Resilience results by algorithm
+            if hasattr(self, 'resilience_by_algorithm') and self.resilience_by_algorithm:
+                for alg_name, results in self.resilience_by_algorithm.items():
+                    if results:
+                        df = pd.DataFrame(results)
+                        sheet_name = f'Resilience_{alg_name}'[:31]  # Excel sheet name limit
+                        df.to_excel(writer, sheet_name=sheet_name, index=False)
 
             # Regional analysis
             if self.regional_analysis is not None:
