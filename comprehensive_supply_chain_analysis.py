@@ -189,28 +189,49 @@ class ComprehensiveSupplyChainAnalysis:
         return robots, tasks_migrated, faulty_robots
 
     def _run_single_algorithm(self, alg_name, tasks, robots, graph):
-        """Run a single algorithm (simplified implementation)"""
-        # Simplified algorithm execution - returns mock results for demonstration
-        # In real implementation, this would call the actual algorithm classes
+        """Run a single algorithm - actual implementation"""
+        from python_src.hgtm.hgtm import Hgtm
+        from python_src.gbma.gbma import GBMA
+        from python_src.mmlma.mmlma import MMLMA
+        from python_src.mpftm.mpftm import MPFTM
+        from python_src.evaluation.evaluation import Evaluation
 
-        result = {
-            'executeCost': random.uniform(100, 500),
-            'migrationCost': random.uniform(50, 200),
-            'survivalRate': random.uniform(0.6, 0.95),
-            'loadBalance': random.uniform(0.1, 0.5)
-        }
+        try:
+            # Run algorithm
+            if alg_name == "HGTM":
+                algo = Hgtm(tasks, graph, robots, 0.1, 0.9)
+                experiment_result = algo.hgtm_run()
+            elif alg_name == "GBMA":
+                algo = GBMA(tasks, graph, robots, 0.1, 0.9)
+                experiment_result = algo.gbma_run()
+            elif alg_name == "MMLMA":
+                algo = MMLMA(tasks, graph, robots, 0.1, 0.9)
+                experiment_result = algo.mmlma_run()
+            elif alg_name == "MPFTM":
+                algo = MPFTM(tasks, graph, robots, 0.1, 0.9)
+                experiment_result = algo.mpftm_run()
+            else:
+                return None
 
-        # Add algorithm-specific adjustments
-        if alg_name == "HGTM":
-            result['survivalRate'] *= 0.95
-        elif alg_name == "GBMA":
-            result['migrationCost'] *= 1.2
-        elif alg_name == "MMLMA":
-            result['loadBalance'] *= 0.8
-        elif alg_name == "MPFTM":
-            result['executeCost'] *= 0.9
+            # Extract results
+            exec_cost = experiment_result.get_mean_execute_cost()
+            mig_cost = experiment_result.get_mean_migration_cost()
+            survival_rate = experiment_result.get_mean_survival_rate()
 
-        return result
+            # Calculate target optimization
+            target_opt = 0.1 * exec_cost + 0.9 * mig_cost - 0.9 * survival_rate
+
+            return {
+                'executeCost': exec_cost,
+                'migrationCost': mig_cost,
+                'survival_rate': survival_rate,
+                'target_opt': target_opt,
+                'loadBalance': 0.0  # Placeholder
+            }
+
+        except Exception as e:
+            print(f"      Error running {alg_name}: {str(e)}")
+            return None
 
     def _evaluate_result(self, result, robots, faulty_robots, graph):
         """Evaluate algorithm result"""
@@ -339,38 +360,67 @@ class ComprehensiveSupplyChainAnalysis:
             self.regional_analysis = None
 
     def analyze_supply_chain_resilience(self):
-        """Analyze supply chain resilience under different scenarios"""
+        """Analyze supply chain resilience under different scenarios for all algorithms"""
         print("\n[5/7] Analyzing Supply Chain Resilience...")
 
-        fault_rates = [0.1, 0.2, 0.3, 0.4, 0.5]
-        self.resilience_results = []
+        # Reduced to 3 fault rates for faster execution
+        fault_rates = [0.2, 0.3, 0.4]
+        algorithms = ["HGTM", "GBMA", "MMLMA", "MPFTM"]
 
-        for fault_rate in fault_rates:
-            # Simulate network under fault
-            robots_copy = [self._copy_robot(r) for r in self.robots]
-            robots_copy, _, faulty = self._initialize_experiment(
-                robots_copy, self.tasks.copy(), fault_rate
-            )
+        # Store results by algorithm
+        self.resilience_by_algorithm = {}
 
-            # Calculate metrics
-            total_capacity = sum(r.get_capacity() for r in robots_copy)
-            remaining_capacity = sum(r.get_capacity() for r in robots_copy if r.get_fault_a() == 0)
+        for alg_name in algorithms:
+            alg_results = []
 
-            # Check network connectivity after removing faulty nodes
-            G_test = self.graph.copy()
-            faulty_ids = [r.get_robot_id() for r in faulty]
-            G_test.remove_nodes_from(faulty_ids)
+            for fault_rate in fault_rates:
+                try:
+                    # Load fresh data
+                    from python_src.input.reader import read_task, read_robot, read_graph
+                    tasks = read_task('Task_semiconductor.txt')
+                    robots = read_robot('RobotsInformation_semiconductor.txt')
+                    graph = read_graph('Graph_semiconductor.txt')
 
-            self.resilience_results.append({
-                'fault_rate': fault_rate,
-                'remaining_capacity_ratio': remaining_capacity / total_capacity if total_capacity > 0 else 0,
-                'network_connected': nx.is_connected(G_test) if len(G_test.nodes()) > 0 else False,
-                'num_components': nx.number_connected_components(G_test),
-                'largest_component_size': len(max(nx.connected_components(G_test), key=len)) if len(G_test.nodes()) > 0 else 0
-            })
+                    # Initialize with specific fault rate
+                    from python_src.main.initialize import initialization
+                    robots, tasks_mig, faulty = initialization(robots, tasks, fault_rate)
 
-        print(f"  ✓ Tested {len(fault_rates)} fault scenarios")
-        print(f"  ✓ Network remains connected up to {max([r['fault_rate'] for r in self.resilience_results if r['network_connected']], default=0):.0%} fault rate")
+                    # Run algorithm
+                    result = self._run_single_algorithm(alg_name, tasks_mig, robots, graph)
+
+                    if result:
+                        # Calculate metrics
+                        total_capacity = sum(r.get_capacity() for r in robots)
+                        remaining_capacity = sum(r.get_capacity() for r in robots if r.get_fault_a() == 0)
+
+                        # Check network connectivity
+                        G_test = graph.copy()
+                        faulty_ids = [r.get_robot_id() for r in faulty]
+                        G_test.remove_nodes_from(faulty_ids)
+
+                        alg_results.append({
+                            'fault_rate': fault_rate,
+                            'remaining_capacity_ratio': remaining_capacity / total_capacity if total_capacity > 0 else 0,
+                            'survival_rate': result['survival_rate'],
+                            'target_opt': result['target_opt'],
+                            'network_connected': nx.is_connected(G_test) if len(G_test.nodes()) > 0 else False,
+                            'num_components': nx.number_connected_components(G_test),
+                            'num_faulty': len(faulty),
+                            'num_total': len(robots)
+                        })
+                except Exception as e:
+                    print(f"    ⚠ {alg_name} failed at {fault_rate:.0%} fault rate: {str(e)}")
+                    continue
+
+            self.resilience_by_algorithm[alg_name] = alg_results
+
+        print(f"  ✓ Tested {len(fault_rates)} fault scenarios for {len(algorithms)} algorithms")
+
+        # Summary
+        for alg_name in algorithms:
+            if alg_name in self.resilience_by_algorithm and self.resilience_by_algorithm[alg_name]:
+                avg_survival = np.mean([r['survival_rate'] for r in self.resilience_by_algorithm[alg_name]])
+                print(f"    {alg_name}: avg survival rate = {avg_survival:.2%}")
 
     def generate_visualizations(self):
         """Generate all visualizations"""
@@ -524,45 +574,84 @@ class ComprehensiveSupplyChainAnalysis:
         plt.close()
 
     def _plot_resilience_analysis(self, fig_dir):
-        """Plot resilience analysis"""
-        if not self.resilience_results:
+        """Plot resilience analysis comparing all algorithms"""
+        if not hasattr(self, 'resilience_by_algorithm') or not self.resilience_by_algorithm:
             return
 
-        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+        fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+        fig.suptitle('Supply Chain Resilience: Algorithm Comparison under Fault Scenarios',
+                     fontsize=16, fontweight='bold')
 
-        fault_rates = [r['fault_rate'] for r in self.resilience_results]
+        algorithms = list(self.resilience_by_algorithm.keys())
+        colors = {'HGTM': '#1f77b4', 'GBMA': '#ff7f0e', 'MMLMA': '#2ca02c', 'MPFTM': '#d62728'}
+        markers = {'HGTM': 'o', 'GBMA': 's', 'MMLMA': '^', 'MPFTM': 'D'}
 
-        # Capacity retention
-        ax = axes[0]
-        capacity_ratios = [r['remaining_capacity_ratio'] for r in self.resilience_results]
-        ax.plot(fault_rates, capacity_ratios, marker='o', linewidth=2, markersize=8, color='steelblue')
-        ax.fill_between(fault_rates, capacity_ratios, alpha=0.3)
+        # Plot 1: Survival Rate vs Fault Rate
+        ax = axes[0, 0]
+        for alg_name in algorithms:
+            if alg_name in self.resilience_by_algorithm:
+                results = self.resilience_by_algorithm[alg_name]
+                fault_rates = [r['fault_rate'] for r in results]
+                survival_rates = [r['survival_rate'] for r in results]
+                ax.plot(fault_rates, survival_rates, marker=markers.get(alg_name, 'o'),
+                       linewidth=2, markersize=8, label=alg_name, color=colors.get(alg_name))
+
+        ax.set_xlabel('Fault Rate', fontsize=11)
+        ax.set_ylabel('Survival Rate', fontsize=11)
+        ax.set_title('(a) Algorithm Survival Rate under Increasing Faults', fontsize=12, fontweight='bold')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+        ax.set_ylim([0, 1.05])
+
+        # Plot 2: Target Optimization vs Fault Rate
+        ax = axes[0, 1]
+        for alg_name in algorithms:
+            if alg_name in self.resilience_by_algorithm:
+                results = self.resilience_by_algorithm[alg_name]
+                fault_rates = [r['fault_rate'] for r in results]
+                target_opts = [r['target_opt'] for r in results]
+                ax.plot(fault_rates, target_opts, marker=markers.get(alg_name, 'o'),
+                       linewidth=2, markersize=8, label=alg_name, color=colors.get(alg_name))
+
+        ax.set_xlabel('Fault Rate', fontsize=11)
+        ax.set_ylabel('Target Optimization Score', fontsize=11)
+        ax.set_title('(b) Performance Degradation under Faults', fontsize=12, fontweight='bold')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+
+        # Plot 3: Capacity Retention
+        ax = axes[1, 0]
+        for alg_name in algorithms:
+            if alg_name in self.resilience_by_algorithm:
+                results = self.resilience_by_algorithm[alg_name]
+                fault_rates = [r['fault_rate'] for r in results]
+                capacity_ratios = [r['remaining_capacity_ratio'] for r in results]
+                ax.plot(fault_rates, capacity_ratios, marker=markers.get(alg_name, 'o'),
+                       linewidth=2, markersize=8, label=alg_name, color=colors.get(alg_name))
+
         ax.axhline(y=0.5, color='red', linestyle='--', alpha=0.5, label='50% Threshold')
         ax.set_xlabel('Fault Rate', fontsize=11)
         ax.set_ylabel('Remaining Capacity Ratio', fontsize=11)
-        ax.set_title('Supply Chain Capacity Resilience\n(Capacity Retention under Failures)', fontsize=12, fontweight='bold')
+        ax.set_title('(c) Supply Chain Capacity Retention', fontsize=12, fontweight='bold')
         ax.legend()
         ax.grid(True, alpha=0.3)
-        ax.set_ylim([0, 1.1])
+        ax.set_ylim([0, 1.05])
 
-        # Network fragmentation
-        ax = axes[1]
-        num_components = [r['num_components'] for r in self.resilience_results]
-        largest_component = [r['largest_component_size'] for r in self.resilience_results]
-
-        ax.plot(fault_rates, num_components, marker='s', linewidth=2, markersize=8,
-               color='orange', label='Number of Fragments')
-        ax2 = ax.twinx()
-        ax2.plot(fault_rates, largest_component, marker='^', linewidth=2, markersize=8,
-                color='green', label='Largest Component Size')
+        # Plot 4: Network Connectivity
+        ax = axes[1, 1]
+        for alg_name in algorithms:
+            if alg_name in self.resilience_by_algorithm:
+                results = self.resilience_by_algorithm[alg_name]
+                fault_rates = [r['fault_rate'] for r in results]
+                num_components = [r['num_components'] for r in results]
+                ax.plot(fault_rates, num_components, marker=markers.get(alg_name, 'o'),
+                       linewidth=2, markersize=8, label=alg_name, color=colors.get(alg_name))
 
         ax.set_xlabel('Fault Rate', fontsize=11)
-        ax.set_ylabel('Number of Network Fragments', fontsize=11, color='orange')
-        ax2.set_ylabel('Largest Component Size', fontsize=11, color='green')
-        ax.set_title('Network Fragmentation Analysis\n(Connectivity under Disruptions)', fontsize=12, fontweight='bold')
+        ax.set_ylabel('Number of Network Fragments', fontsize=11)
+        ax.set_title('(d) Network Fragmentation Analysis', fontsize=12, fontweight='bold')
+        ax.legend()
         ax.grid(True, alpha=0.3)
-        ax.legend(loc='upper left')
-        ax2.legend(loc='upper right')
 
         plt.tight_layout()
         plt.savefig(fig_dir / f'resilience_analysis_{self.experiment_id}.png', dpi=300, bbox_inches='tight')
